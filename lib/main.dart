@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kurs_sabak8_weather/misaldar/misal_page.dart';
 import 'package:kurs_sabak8_weather/pages/weather_page.dart';
 
 void main() {

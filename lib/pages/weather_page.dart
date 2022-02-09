@@ -1,8 +1,11 @@
+import 'dart:convert' as convert;
 import 'dart:developer';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:kurs_sabak8_weather/constants/app_constants.dart';
 import 'package:kurs_sabak8_weather/pages/city_page.dart';
+import 'package:kurs_sabak8_weather/utils/weather_util.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({
@@ -14,17 +17,26 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-  String _celcius = '92';
-  String _description = 'asdsa asdsa asdsa asdsa asdsa asdsa asdsa';
+  String _celcius = '';
+  String _cityName = '';
+  String _icon;
+  String _description = 'no data available';
+  bool _isLoading = false;
 
   @override
   void initState() {
     showWeatherByLocation();
+
     super.initState();
   }
 
-  void showWeatherByLocation() async {
+  Future<void> showWeatherByLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
     final position = await getCurrentPosition();
+
+    await getWeatherByLocation(position: position);
 
     log('position latitude: ${position.latitude}');
     log('position longitude: ${position.longitude}');
@@ -65,6 +77,57 @@ class _WeatherPageState extends State<WeatherPage> {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> getWeatherByLocation({@required Position position}) async {
+    var client = http.Client();
+    try {
+      Uri _uri = Uri.parse(
+          'https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=$openWeatherApiKey');
+      final response = await client.get(_uri);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final body = response.body;
+
+        /// [body] bul json turundo
+        /// munu biz, dart tushuno turgan tipke ozgortushubuz kerek
+
+        // [   ] List
+        // {   } Map
+        //  ' '  String
+
+        final _data = convert.json.decode(body) as Map<String, dynamic>;
+
+        _cityName = _data['name'];
+
+        /// temperature kelvin turundo kelet
+        /// kelvin di celcius ka ozgortuu kerek
+        /// celcius = kelvin - 273,15;
+        final kelvin = _data['main']['temp'] as double;
+
+        _celcius = WeatherUtil.kelvinToCelcius(kelvin).toString();
+        _icon = WeatherUtil.getWeatherIcon(kelvin.toInt());
+
+        _description = WeatherUtil.getWeatherMessage(int.parse(_celcius));
+
+        // (32°F − 32) × 5/9 = 0°C
+        // round
+        // 14.6 = 15
+        // 14.3 = 14
+
+        // _celcius = (kelvin - 273.15).round().toString();
+        // _celcius = (temp - 273.15).toStringAsFixed(1);
+
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      throw Exception(e);
+    }
   }
 
   @override
@@ -108,33 +171,51 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(height: _size.height * 0.2),
-              Text(
-                '$_celcius\u00B0 ☀',
-                style: const TextStyle(
-                  fontSize: 84,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          child: _isLoading
+              ? const CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                  color: Colors.cyanAccent,
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: _size.height * 0.2),
+                    Text(
+                      _celcius.isEmpty ? '0\u00B0 ☀' : '$_celcius\u00B0 $_icon',
+                      style: const TextStyle(
+                        fontSize: 84,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    _cityName.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 24.0),
+                            child: Text(
+                              _cityName,
+                              style: const TextStyle(
+                                fontSize: 34,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    SizedBox(height: _size.height * 0.1),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Text(
+                        _description,
+                        style: const TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(height: _size.height * 0.1),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Text(
-                  _description,
-                  style: const TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
