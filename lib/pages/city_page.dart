@@ -71,7 +71,7 @@ class CityPage extends StatelessWidget {
                     FocusScope.of(context).unfocus();
                     log('textController: ${textController.text}');
 
-                    Navigator.pop(context);
+                    Navigator.pop(context, textController.text);
                   },
                   style: outlineButtonStyle,
                   child: const Padding(
