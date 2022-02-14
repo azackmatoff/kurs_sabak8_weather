@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kurs_sabak8_weather/misaldar/misal2_page.dart';
 import 'package:kurs_sabak8_weather/misaldar/misal_page.dart';
+import 'package:kurs_sabak8_weather/pages/weather_model_page.dart';
 import 'package:kurs_sabak8_weather/pages/weather_page.dart';
 
 void main() {
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const WeatherPage(),
+      home: const WeatherModelPage(),
     );
   }
 }
