@@ -1,16 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kurs_sabak8_weather/app/presentation/widgets/container_with_bg_image.dart';
 
-class CityPage extends StatelessWidget {
-  CityPage({Key key}) : super(key: key);
+class CityView extends StatelessWidget {
+  CityView({Key key}) : super(key: key);
 
-  TextEditingController textController = TextEditingController();
+  final _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final _size = MediaQuery.of(context).size;
-
     final ButtonStyle outlineButtonStyle = OutlinedButton.styleFrom(
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -26,15 +25,7 @@ class CityPage extends StatelessWidget {
         title: Text('Find by city'.toUpperCase()),
         centerTitle: true,
       ),
-      body: Container(
-        height: _size.height,
-        width: _size.width,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
+      body: ContainerWithBgImage(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18.0),
           child: Center(
@@ -42,7 +33,7 @@ class CityPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextField(
-                  controller: textController,
+                  controller: _textController,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -68,10 +59,21 @@ class CityPage extends StatelessWidget {
                 const SizedBox(height: 40),
                 OutlinedButton(
                   onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    log('textController: ${textController.text}');
+                    if (_textController.text.isEmpty) {
+                      return;
+                    }
 
-                    Navigator.pop(context, textController.text);
+                    FocusScope.of(context).unfocus();
+                    log('textController: ${_textController.text}');
+
+                    Navigator.pop(context, _textController.text);
+
+                    // if (textController.text.isNotEmpty) {
+                    //   FocusScope.of(context).unfocus();
+                    //   log('textController: ${textController.text}');
+
+                    //   Navigator.pop(context, textController.text);
+                    // }
                   },
                   style: outlineButtonStyle,
                   child: const Padding(

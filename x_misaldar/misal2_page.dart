@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kurs_sabak8_weather/misaldar/misal_page.dart';
+
+import 'misal_page.dart';
 
 class Misal2Page extends StatelessWidget {
   const Misal2Page({Key key}) : super(key: key);

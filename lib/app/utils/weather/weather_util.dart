@@ -1,5 +1,5 @@
 class WeatherUtil {
-  static String kelvinToCelcius(double kelvin) {
+  static String kelvinToCelcius(num kelvin) {
     return (kelvin - 273.15).round().toString();
   }
 

@@ -1,4 +1,4 @@
-import 'package:kurs_sabak8_weather/data/utils/weather_util.dart';
+import 'package:kurs_sabak8_weather/app/utils/weather/weather_util.dart';
 
 /// class
 /// object

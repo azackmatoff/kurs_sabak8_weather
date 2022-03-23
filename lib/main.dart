@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:kurs_sabak8_weather/misaldar/misal2_page.dart';
-import 'package:kurs_sabak8_weather/misaldar/misal_page.dart';
-import 'package:kurs_sabak8_weather/pages/weather_model_page.dart';
-import 'package:kurs_sabak8_weather/pages/weather_page.dart';
+import 'package:kurs_sabak8_weather/app/presentation/views/weather_view.dart';
+import 'package:kurs_sabak8_weather/app/utils/constants/colors/app_colors.dart';
+import 'package:kurs_sabak8_weather/app/utils/di/di_locator.dart';
 
-void main() {
+///Design architecture
+///MVVM
+///MVC
+///MVI
+///State Management
+///Refactoring, clean code
+void main() async {
+  await initDI();
   runApp(const MyApp());
 }
 
@@ -18,9 +24,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Weather App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: AppColors.blue,
       ),
-      home: const WeatherModelPage(),
+      home: const WeatherView(),
     );
   }
 }

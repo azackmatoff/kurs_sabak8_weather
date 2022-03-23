@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:kurs_sabak8_weather/data/services/geo_location_service.dart';
-import 'package:kurs_sabak8_weather/data/services/weather_service.dart';
-import 'package:kurs_sabak8_weather/models/weather_model.dart';
-import 'package:kurs_sabak8_weather/widgets/container_with_bg_image.dart';
-import 'package:kurs_sabak8_weather/widgets/custom_progress_indicator.dart';
-import 'package:kurs_sabak8_weather/widgets/weather_page_content.dart';
+import 'package:kurs_sabak8_weather/app/data/models/weather_model.dart';
+import 'package:kurs_sabak8_weather/app/data/repository/geolocation_repository.dart';
+import 'package:kurs_sabak8_weather/app/data/repository/weather_repository.dart';
 
-import 'city_page.dart';
+import 'package:kurs_sabak8_weather/app/presentation/widgets/container_with_bg_image.dart';
+import 'package:kurs_sabak8_weather/app/presentation/widgets/custom_progress_indicator.dart';
+import 'package:kurs_sabak8_weather/app/presentation/widgets/weather_page_content.dart';
+import 'package:kurs_sabak8_weather/app/utils/di/di_locator.dart';
 
-class WeatherModelPage extends StatefulWidget {
-  const WeatherModelPage({Key key}) : super(key: key);
+import 'city_view.dart';
+
+// REFACTORING
+class WeatherView extends StatefulWidget {
+  const WeatherView({Key key}) : super(key: key);
 
   @override
-  _WeatherModelPageState createState() => _WeatherModelPageState();
+  _WeatherViewState createState() => _WeatherViewState();
 }
 
-class _WeatherModelPageState extends State<WeatherModelPage> {
+class _WeatherViewState extends State<WeatherView> {
   bool _isLoading = false;
 
   WeatherModel _weatherModel;
@@ -30,9 +33,10 @@ class _WeatherModelPageState extends State<WeatherModelPage> {
     setState(() {
       _isLoading = true;
     });
-    final _position = await GeoLocationService().getCurrentPosition();
+    final _position = await getIt<GeolocationRepository>().getCurrentPosition();
 
-    _weatherModel = await WeatherService().getWeatherModelByLocation(_position);
+    _weatherModel =
+        await getIt<WeatherRepository>().getWeatherModelByLocation(_position);
 
     setState(() {
       _isLoading = false;
@@ -44,7 +48,8 @@ class _WeatherModelPageState extends State<WeatherModelPage> {
       _isLoading = true;
     });
 
-    _weatherModel = await WeatherService().getWeatherModelByCity(_city);
+    _weatherModel =
+        await getIt<WeatherRepository>().getWeatherModelByCity(_city);
 
     setState(() {
       _isLoading = false;
@@ -75,7 +80,7 @@ class _WeatherModelPageState extends State<WeatherModelPage> {
           IconButton(
             onPressed: () async {
               final _typedCity = await Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => CityPage()));
+                  context, MaterialPageRoute(builder: (context) => CityView()));
 
               await getWeatherByCity(_typedCity);
             },
